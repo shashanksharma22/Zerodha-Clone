@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
-
 import axios from "axios";
-
 import GeneralContext from "./GeneralContext";
-
 import "./BuyActionWindow.css";
+
+// Dynamic URL fallback logic
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
 
 const SellActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
@@ -15,7 +15,7 @@ const SellActionWindow = ({ uid }) => {
   const handleSellClick = async () => {
     try {
       // Check holdings to ensure enough quantity
-      const res = await axios.get("http://localhost:3002/allHoldings");
+      const res = await axios.get(`${BACKEND_URL}/allHoldings`);
       const holdings = res.data || [];
       const holding = holdings.find((h) => h.name === uid);
 
@@ -29,7 +29,7 @@ const SellActionWindow = ({ uid }) => {
         return;
       }
 
-      await axios.post("http://localhost:3002/newOrder", {
+      await axios.post(`${BACKEND_URL}/newOrder`, {
         name: uid,
         qty: Number(stockQuantity),
         price: Number(stockPrice),
@@ -40,7 +40,7 @@ const SellActionWindow = ({ uid }) => {
       window.dispatchEvent(new Event("ordersUpdated"));
 
       // Update holdings on backend (decrease qty or remove)
-      await axios.post("http://localhost:3002/updateHolding", {
+      await axios.post(`${BACKEND_URL}/updateHolding`, {
         name: uid,
         qty: Number(stockQuantity),
         price: Number(stockPrice),

@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
+// Dynamic URL fallback logic
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+
 const Orders = () => {
   const [orders, setOrders] = useState([]);
 
   const fetchOrders = () => {
-    axios.get("http://localhost:3002/allOrders").then((res) => {
+    axios.get(`${BACKEND_URL}/allOrders`).then((res) => {
       setOrders(res.data || []);
     });
   };

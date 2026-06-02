@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
-
 import axios from "axios";
-
 import GeneralContext from "./GeneralContext";
-
 import "./BuyActionWindow.css";
+
+// Dynamic URL fallback logic
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
 
 const BuyActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
@@ -14,7 +14,7 @@ const BuyActionWindow = ({ uid }) => {
 
   const handleBuyClick = async () => {
     try {
-      await axios.post("http://localhost:3002/newOrder", {
+      await axios.post(`${BACKEND_URL}/newOrder`, {
         name: uid,
         qty: Number(stockQuantity),
         price: Number(stockPrice),
@@ -24,7 +24,7 @@ const BuyActionWindow = ({ uid }) => {
       window.dispatchEvent(new Event("ordersUpdated"));
 
       // Update holdings on backend (create or update average and qty)
-      await axios.post("http://localhost:3002/updateHolding", {
+      await axios.post(`${BACKEND_URL}/updateHolding`, {
         name: uid,
         qty: Number(stockQuantity),
         price: Number(stockPrice),
