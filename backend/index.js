@@ -17,13 +17,16 @@ const uri = process.env.MONGO_URL;
 
 const app = express();
 
-// CORS Configuration
+// 1. Trust Proxy: Crucial for Render to allow secure cross-origin cookies
+app.set("trust proxy", 1);
+
+// 2. CORS Configuration: Whitelisting your specific live URLs
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
-  process.env.FRONTEND_URL,
-  process.env.DASHBOARD_URL
-].filter(Boolean);
+  "https://zerodha-frontend-ahcq.onrender.com",
+  "https://zerodha-dashboard-jb24.onrender.com"
+];
 
 app.use(
   cors({
@@ -38,14 +41,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Session Configuration
+// 3. Session Configuration: Dynamic security for live vs local testing
 app.use(
   session({
     secret: "your-secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      // true for HTTPS (Render), false for HTTP (localhost)
+      secure: process.env.NODE_ENV === "production", 
+      // 'none' allows cross-site cookies, 'lax' is for localhost
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     },
